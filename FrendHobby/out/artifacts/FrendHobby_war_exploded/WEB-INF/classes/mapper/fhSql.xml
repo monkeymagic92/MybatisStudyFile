@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jy.fh.dao.FhDAO">
+
+    <!--  function 테스트  -->
+    <!--  함수 매개변수에 어떤값이 들어오냐 따라 TEST_BOARD_1 테이블 title 컬럼값 조회
+        CREATE OR REPLACE FUNCTION FN_TEST_BOARD_SELECT(FN_I_BOARD NUMBER)
+            RETURN VARCHAR2
+        IS
+            FN_TITLE VARCHAR2(100);
+        BEGIN
+            SELECT title INTO FN_TITLE FROM TEST_BOARD_1
+            WHERE i_board = FN_I_BOARD;
+
+            RETURN FN_TITLE;
+            END;
+    -->
+    <select id="functionTest" parameterType="FhVO" resultType="LinkedHashMap">
+        SELECT FN_TEST_BOARD_SELECT(#{i_board}) AS TITLE FROM DUAL
+    </select>
+
+
+    <!-- trigger 테스트 -->
+    <!--
+        '광고', '스팸' 단어가 들어오면 TEST_BOARD_2 테이블에 INSERT
+
+        CREATE OR REPLACE TRIGGER SPAM_BOARD
+        AFTER
+            INSERT ON TEST_BOARD_1
+        FOR EACH ROW
+            WHEN (NEW.title LIKE '%광고%' OR NEW.TITLE LIKE '%스팸%')
+        BEGIN
+            IF INSERTING THEN
+                INSERT INTO TEST_BOARD_2(i_board, title)
+                            VALUES (:NEW.i_board, :NEW.title);
+            END IF;
+        END SPAM_BOARD;
+    -->
+    <select id="selBoard1" resultType="FhVO">
+        SELECT i_board, title FROM TEST_BOARD_1
+    </select>
+
+    <select id="selBoard2" resultType="FhVO">
+        SELECT i_board, title FROM TEST_BOARD_2
+    </select>
+
+    <insert id="insBoard" parameterType="FhVO">
+        INSERT INTO TEST_BOARD_1
+        (i_board, title)
+        VALUES
+        (#{i_board}, #{title})
+    </insert>
+
+
+    <!--   Encoding 테스트용 -->
+    <!--    filter 태그 추가 / 제거에 따른 인코딩(UTF-8) 차이
+        web.xml
+        <filter>
+            <filter-name>encodingFilter</filter-name>
+            <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+            <init-param>
+                <param-name>encoding</param-name>
+                <param-value>UTF-8</param-value>
+            </init-param>
+            <init-param>
+                <param-name>forceEncoding</param-name>
+                <param-value>true</param-value>
+            </init-param>
+        </filter>
+        <filter-mapping>
+            <filter-name>encodingFilter</filter-name>
+            <url-pattern>/*</url-pattern>
+        </filter-mapping>
+    -->
+    <insert id="test" parameterType="FhVO">
+        INSERT INTO JY
+        (JY)
+        VALUES
+        (#{JY})
+    </insert>
+
+    <select id="selTest" resultType="FhVO">
+        SELECT JY FROM JY
+    </select>
+
+
+</mapper>
